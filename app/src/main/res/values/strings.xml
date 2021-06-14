@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Android showcase - TODO</string>
+
+    <string name="add_edit_creation_date">Created: %s</string>
+    <string name="add_edit_important_task">Important task</string>
+    <string name="add_edit_task_name">Task name</string>
+    <string name="add_edit_title_edit">Edit task</string>
+    <string name="add_edit_title_new">New task</string>
+
+    <string name="confirmation_task_added">Task added</string>
+    <string name="confirmation_task_updated">Task updated</string>
+
+    <string name="delete_dialog_cancel">Cancel</string>
+    <string name="delete_dialog_message">Do you really want to delete all completed tasks?</string>
+    <string name="delete_dialog_title">Confirm deletion</string>
+    <string name="delete_dialog_yes">Yes</string>
+
+    <string name="invalid_input_message">Name cannot be empty!</string>
+
+    <string name="task_list_no_element">No elements added</string>
+</resources>
