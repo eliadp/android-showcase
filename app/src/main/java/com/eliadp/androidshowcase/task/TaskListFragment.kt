@@ -18,14 +18,14 @@ import com.eliadp.androidshowcase.task.addedit.AddEditTaskFragment.Companion.ADD
 import com.eliadp.androidshowcase.task.entities.TaskUIModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.stateViewModel
 
 class TaskListFragment : Fragment() {
 
     private var _binding: FragmentTaskListBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TaskListViewModel by viewModel()
+    private val viewModel: TaskListViewModel by stateViewModel()
 
     private val taskListAdapter = TaskListAdapter(object : TaskListListener {
         override fun onItemClicked(task: TaskUIModel) {
@@ -133,25 +133,28 @@ class TaskListFragment : Fragment() {
     }
 
     private fun FragmentTaskListBinding.bindDataState(state: TaskListState.Data) {
-        setupMenu(state.hideCompleted)
+        setupMenu(state.hideCompleted, state.query)
 
         labelNoElement.visibility = View.GONE
         binding.recyclerViewTasks.visibility = View.VISIBLE
         taskListAdapter.submitList(state.tasks)
-
-        bindSearchView(state.query)
     }
 
-    private fun setupMenu(hideCompleted: Boolean) {
+    private fun setupMenu(hideCompleted: Boolean, query: String) {
         if (::hideCompletedTaskMenuItem.isInitialized) {
             hideCompletedTaskMenuItem.isChecked = hideCompleted
         }
+        bindSearchView(query)
     }
 
     private fun bindSearchView(query: String) {
-        if (::searchItem.isInitialized && query.isNotEmpty()) {
-            searchItem.expandActionView()
-            searchView.setQuery(query, false)
+        if (query.isNotEmpty()) {
+            if (::searchItem.isInitialized) {
+                searchItem.expandActionView()
+            }
+            if (::searchView.isInitialized) {
+                searchView.setQuery(query, false)
+            }
         }
     }
 
@@ -198,7 +201,7 @@ class TaskListFragment : Fragment() {
                 ).show()
             }
             is TaskListAction.SetupMenu -> {
-                setupMenu(action.hideCompleted)
+                setupMenu(action.hideCompleted, action.query)
             }
         }.exhaustive
     }

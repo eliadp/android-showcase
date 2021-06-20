@@ -33,7 +33,7 @@ sealed class TaskListAction {
     object ShowTaskAddedConfirmationMessage : TaskListAction()
     object ShowTaskUpdatedConfirmationMessage : TaskListAction()
     object ShowDeleteConfirmationDialog : TaskListAction()
-    data class SetupMenu(val hideCompleted: Boolean) : TaskListAction()
+    data class SetupMenu(val hideCompleted: Boolean, val query: String) : TaskListAction()
 }
 
 class TaskListViewModel(
@@ -47,7 +47,7 @@ class TaskListViewModel(
 
     private var actionHandler: ((action: TaskListAction) -> Unit)? = null
 
-    private val searchQuery = MutableStateFlow("")
+    private val searchQuery = MutableStateFlow(SEARCH_QUERY_DEFAULT)
     private val preferences = loadPreferencesUseCase()
     private val tasks = combine(
         searchQuery,
@@ -131,6 +131,15 @@ class TaskListViewModel(
 
     fun onMenuCreated() {
         val currentState = state.value as? TaskListState.Data ?: return
-        actionHandler?.invoke(TaskListAction.SetupMenu(currentState.hideCompleted))
+        actionHandler?.invoke(
+            TaskListAction.SetupMenu(
+                currentState.hideCompleted,
+                searchQuery.value
+            )
+        )
+    }
+
+    companion object {
+        private const val SEARCH_QUERY_DEFAULT = ""
     }
 }
