@@ -1,5 +1,6 @@
 package com.eliadp.androidshowcase
 
+import androidx.lifecycle.SavedStateHandle
 import com.eliadp.androidshowcase.task.TaskListViewModel
 import com.eliadp.androidshowcase.task.addedit.AddEditTaskViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -7,8 +8,9 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    viewModel {
+    viewModel { (savedState: SavedStateHandle) ->
         TaskListViewModel(
+            savedState = savedState,
             loadTaskListUseCase = get(),
             updateTaskUseCase = get(),
             deleteCompletedTasksUseCase = get(),

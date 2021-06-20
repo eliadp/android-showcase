@@ -1,16 +1,16 @@
 package com.eliadp.androidshowcase.task
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.eliadp.androidshowcase.domain.task.entities.SortOrder
 import com.eliadp.androidshowcase.domain.task.usecases.*
 import com.eliadp.androidshowcase.task.addedit.AddEditTaskViewModel.Companion.ADD_TASK_RESULT_OK
 import com.eliadp.androidshowcase.task.addedit.AddEditTaskViewModel.Companion.EDIT_TASK_RESULT_OK
 import com.eliadp.androidshowcase.task.entities.TaskUIModel
 import com.eliadp.androidshowcase.task.entities.toUIModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 sealed class TaskListState {
@@ -37,6 +37,7 @@ sealed class TaskListAction {
 }
 
 class TaskListViewModel(
+    savedState: SavedStateHandle,
     private val loadTaskListUseCase: LoadTaskListUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteCompletedTasksUseCase: DeleteCompletedTasksUseCase,
@@ -47,10 +48,10 @@ class TaskListViewModel(
 
     private var actionHandler: ((action: TaskListAction) -> Unit)? = null
 
-    private val searchQuery = MutableStateFlow(SEARCH_QUERY_DEFAULT)
+    private val searchQuery = savedState.getLiveData("searchQuery", SEARCH_QUERY_DEFAULT)
     private val preferences = loadPreferencesUseCase()
     private val tasks = combine(
-        searchQuery,
+        searchQuery.asFlow(),
         preferences,
     ) { query, filterPreferences ->
         Pair(query, filterPreferences)
@@ -68,10 +69,10 @@ class TaskListViewModel(
                 TaskListState.Data(
                     tasks = list.map { it.toUIModel() },
                     hideCompleted = preferences.first().hideCompleted,
-                    query = searchQuery.value,
+                    query = searchQuery.value ?: SEARCH_QUERY_DEFAULT,
                 )
             } else {
-                TaskListState.Empty(searchQuery.value)
+                TaskListState.Empty(searchQuery.value ?: SEARCH_QUERY_DEFAULT)
             }
         }
         .asLiveData()
@@ -134,7 +135,7 @@ class TaskListViewModel(
         actionHandler?.invoke(
             TaskListAction.SetupMenu(
                 currentState.hideCompleted,
-                searchQuery.value
+                searchQuery.value ?: SEARCH_QUERY_DEFAULT,
             )
         )
     }
