@@ -33,6 +33,7 @@ sealed class TaskListAction {
     object ShowTaskAddedConfirmationMessage : TaskListAction()
     object ShowTaskUpdatedConfirmationMessage : TaskListAction()
     object ShowDeleteConfirmationDialog : TaskListAction()
+    data class SetupMenu(val hideCompleted: Boolean) : TaskListAction()
 }
 
 class TaskListViewModel(
@@ -126,5 +127,10 @@ class TaskListViewModel(
 
     fun onQueryTextChanged(query: String) {
         searchQuery.value = query
+    }
+
+    fun onMenuCreated() {
+        val currentState = state.value as? TaskListState.Data ?: return
+        actionHandler?.invoke(TaskListAction.SetupMenu(currentState.hideCompleted))
     }
 }

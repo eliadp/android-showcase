@@ -91,6 +91,7 @@ class TaskListFragment : Fragment() {
         searchView.onQueryTextChanged {
             viewModel.onQueryTextChanged(it)
         }
+        viewModel.onMenuCreated()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -132,15 +133,19 @@ class TaskListFragment : Fragment() {
     }
 
     private fun FragmentTaskListBinding.bindDataState(state: TaskListState.Data) {
-        if (::hideCompletedTaskMenuItem.isInitialized) {
-            hideCompletedTaskMenuItem.isChecked = state.hideCompleted
-        }
+        setupMenu(state.hideCompleted)
 
         labelNoElement.visibility = View.GONE
         binding.recyclerViewTasks.visibility = View.VISIBLE
         taskListAdapter.submitList(state.tasks)
 
         bindSearchView(state.query)
+    }
+
+    private fun setupMenu(hideCompleted: Boolean) {
+        if (::hideCompletedTaskMenuItem.isInitialized) {
+            hideCompletedTaskMenuItem.isChecked = hideCompleted
+        }
     }
 
     private fun bindSearchView(query: String) {
@@ -191,6 +196,9 @@ class TaskListFragment : Fragment() {
                     R.string.confirmation_task_updated,
                     Snackbar.LENGTH_SHORT,
                 ).show()
+            }
+            is TaskListAction.SetupMenu -> {
+                setupMenu(action.hideCompleted)
             }
         }.exhaustive
     }
