@@ -126,7 +126,7 @@ class TaskListFragment : Fragment() {
                     recyclerViewTasks.visibility = View.GONE
                 }
 
-                bindSearchView(state.query)
+                setupMenu(state.hideCompleted, state.query)
             }
             TaskListState.Loading -> Unit
         }.exhaustive
