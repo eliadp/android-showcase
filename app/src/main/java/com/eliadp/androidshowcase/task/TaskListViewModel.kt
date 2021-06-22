@@ -70,12 +70,12 @@ class TaskListViewModel(
                 TaskListState.Data(
                     tasks = list.map { it.toUIModel() },
                     hideCompleted = preferences.first().hideCompleted,
-                    query = searchQuery.value,
+                    query = searchQuery.value ?: SEARCH_QUERY_DEFAULT,
                 )
             } else {
                 TaskListState.Empty(
                     hideCompleted = preferences.first().hideCompleted,
-                    query = searchQuery.value,
+                    query = searchQuery.value ?: SEARCH_QUERY_DEFAULT,
                 )
             }
         }
