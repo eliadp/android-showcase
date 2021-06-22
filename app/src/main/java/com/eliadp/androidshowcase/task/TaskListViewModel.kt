@@ -17,6 +17,7 @@ sealed class TaskListState {
     object Loading : TaskListState()
 
     data class Empty(
+        val hideCompleted: Boolean,
         val query: String,
     ) : TaskListState()
 
@@ -69,10 +70,13 @@ class TaskListViewModel(
                 TaskListState.Data(
                     tasks = list.map { it.toUIModel() },
                     hideCompleted = preferences.first().hideCompleted,
-                    query = searchQuery.value ?: SEARCH_QUERY_DEFAULT,
+                    query = searchQuery.value,
                 )
             } else {
-                TaskListState.Empty(searchQuery.value ?: SEARCH_QUERY_DEFAULT)
+                TaskListState.Empty(
+                    hideCompleted = preferences.first().hideCompleted,
+                    query = searchQuery.value,
+                )
             }
         }
         .asLiveData()
@@ -131,11 +135,20 @@ class TaskListViewModel(
     }
 
     fun onMenuCreated() {
-        val currentState = state.value as? TaskListState.Data ?: return
+        val hideCompleted = when (val currentState = state.value) {
+            is TaskListState.Data -> currentState.hideCompleted
+            is TaskListState.Empty -> currentState.hideCompleted
+            else -> return
+        }
+        val query = when (val currentState = state.value) {
+            is TaskListState.Data -> currentState.query
+            is TaskListState.Empty -> currentState.query
+            else -> return
+        }
         actionHandler?.invoke(
             TaskListAction.SetupMenu(
-                currentState.hideCompleted,
-                searchQuery.value ?: SEARCH_QUERY_DEFAULT,
+                hideCompleted,
+                query,
             )
         )
     }

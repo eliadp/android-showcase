@@ -18,14 +18,14 @@ import com.eliadp.androidshowcase.task.addedit.AddEditTaskFragment.Companion.ADD
 import com.eliadp.androidshowcase.task.entities.TaskUIModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import org.koin.androidx.viewmodel.ext.android.stateViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TaskListFragment : Fragment() {
 
     private var _binding: FragmentTaskListBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: TaskListViewModel by stateViewModel()
+    private val viewModel: TaskListViewModel by viewModel()
 
     private val taskListAdapter = TaskListAdapter(object : TaskListListener {
         override fun onItemClicked(task: TaskUIModel) {
@@ -126,7 +126,7 @@ class TaskListFragment : Fragment() {
                     recyclerViewTasks.visibility = View.GONE
                 }
 
-                bindSearchView(state.query)
+                setupMenu(state.hideCompleted, state.query)
             }
             TaskListState.Loading -> Unit
         }.exhaustive
